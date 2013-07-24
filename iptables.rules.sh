@@ -47,7 +47,7 @@ UDP_PORTS_PROTECTION="27015:27016"
 # ___|___|___|___|___|___|___|___|___|___|___|___|__        IPTables: Linux's Main line of Defense               ##
 # _|___|___|___|___|___|___|___|___|___|___|___|___|        IPTables: Linux's way of saying no to DoS kids       ##
 # ___|___|___|___|___|___|___|___|___|___|___|___|__                                                             ##    
-# _|___|___|___|___|___|___|___|___|___|___|___|___|        Version 1.0 -                                        ##
+# _|___|___|___|___|___|___|___|___|___|___|___|___|        Version 1.0.1 -                                      ##
 # ___|___|___|___|___|___|___|___|___|___|___|___|__        IPTables Script created by Sir                       ##
 # _|___|___|___|___|___|___|___|___|___|___|___|___|                                                             ##
 # ___|___|___|___|___|___|___|___|___|___|___|___|__        Sources used and Studied;                            ##
@@ -76,7 +76,18 @@ iptables -P OUTPUT ACCEPT
 ## Create Filter
 ##---------------------
 iptables -N filter
+iptables -N LOGINVALID
+iptables -N LOGFLOOD
 ##---------------------
+
+## Create Filter Rules
+##---------------------
+iptables -A filter -m state --state NEW -m hashlimit --hashlimit-upto 1/sec --hashlimit-burst 5 --hashlimit-mode srcip,dstport --hashlimit-name DOSPROTECT --hashlimit-htable-expire 3600000 -j ACCEPT
+iptables -A LOGINVALID -m limit --limit 60/min -j LOG --log-prefix "Invalid Packets Dropped: " --log-level 4
+iptables -A LOGFLOOD -m limit --limit 60/min -j LOG --log-prefix "Valid Packets (Flood) Dropped: " --log-level 4
+iptables -A LOGINVALID -j DROP
+iptables -A LOGFLOOD -j DROP
+
 
 # Allow Self
 iptables -A INPUT -i lo -j ACCEPT
@@ -87,14 +98,17 @@ iptables -A INPUT -i lo -j ACCEPT
 # Accept Established Connections
 iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
 
-# Block Packets ranging from 0:32, 46 and 2521:65535 (Never Used, thus Invalid Packets) - This will catch all DoS attempts and Invalid Packet (weak) DDoS attacks as well.
-iptables -A INPUT -p udp -m multiport --dports $GAMESERVERPORTS -m length --length 0:32 -j DROP
-iptables -A INPUT -p udp -m multiport --dports $GAMESERVERPORTS -m length --length 46 -j DROP
-iptables -A INPUT -p udp -m multiport --dports $GAMESERVERPORTS -m length --length 2521:65535 -j DROP
+# Block Packets ranging from 0:28, 30:32, 46 and 2521:65535 (Never Used, thus Invalid Packets) - This will catch all DoS attempts and Invalid Packet (weak) DDoS attacks as well.
+iptables -A INPUT -p udp -m multiport --dports $GAMESERVERPORTS -m length --length 0:28 -j LOGINVALID
+iptables -A INPUT -p udp -m multiport --dports $GAMESERVERPORTS -m length --length 30:32 -j LOGINVALID
+iptables -A INPUT -p udp -m multiport --dports $GAMESERVERPORTS -m length --length 46 -j LOGINVALID
+iptables -A INPUT -p udp -m multiport --dports $GAMESERVERPORTS -m length --length 2521:65535 -j LOGINVALID
 
 # Rate Limit
 iptables -A INPUT -p udp -m multiport --dports $UDP_PORTS_PROTECTION -j filter
+iptables -A INPUT -p udp -m multiport --dports $UDP_PORTS_PROTECTION -j LOGFLOOD
 # iptables -A INPUT -p tcp -m multiport --dports $TCP_PORTS_PROTECTION -j filter
+
 
 #
 # Rcon Usage - Only allow your own IP!
@@ -103,7 +117,6 @@ iptables -A INPUT -p udp -m multiport --dports $UDP_PORTS_PROTECTION -j filter
 
 iptables -A INPUT -p tcp -m multiport --dports $GAMESERVERPORTS -s $YOUR_HOME_IP -j ACCEPT
 iptables -A INPUT -p tcp -m multiport --dports $GAMESERVERPORTS -j DROP
-iptables -A filter -m state --state NEW -m hashlimit --hashlimit-upto 1/sec --hashlimit-burst 5 --hashlimit-mode srcip,dstport --hashlimit-name DOSPROTECT --hashlimit-htable-expire 3600000 -j ACCEPT
 
 # SSH
 iptables -A INPUT -p tcp --dport $SSH_PORT -s $YOUR_HOME_IP -j ACCEPT

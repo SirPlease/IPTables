@@ -65,6 +65,21 @@ chmod +x /filelocationhere/iptables.rules.sh
 Yes, you can safely make changes.
 When you're done, execute the script and then do "iptables-save > /etc/iptables.up.rules"
 
+- *Where do the Logs get saved?*
+
+You can view the logs in: /var/logs/messages
+Easiest way to find Invalid Packets/Flood is to search for either;
+
+Invalid Packets Dropped:
+Valid Packets (Flood) Dropped:
+
+* SRC= The source ip-address from where the packet originated
+* DST= The destination ip-address where the packet was sent to
+* LEN= Length of the packet
+* PROTO= Indicates the protocol. (UDP in this case)
+* SPT= Indicates the source port.
+* DPT= Indicates the destination port.
+
 
 
 
