@@ -82,7 +82,7 @@ iptables -N LOGFLOOD
 
 ## Create Filter Rules
 ##---------------------
-iptables -A filter -m state --state NEW -m hashlimit --hashlimit-upto 1/sec --hashlimit-burst 5 --hashlimit-mode srcip,dstport --hashlimit-name DOSPROTECT --hashlimit-htable-expire 3600000 -j ACCEPT
+iptables -A filter -m state --state NEW -m hashlimit --hashlimit-upto 1/sec --hashlimit-burst 5 --hashlimit-mode srcip,dstport --hashlimit-name DOSPROTECT --hashlimit-htable-expire 60000 -j ACCEPT
 iptables -A LOGINVALID -m limit --limit 60/min -j LOG --log-prefix "Invalid Packets Dropped: " --log-level 4
 iptables -A LOGFLOOD -m limit --limit 60/min -j LOG --log-prefix "Valid Packets (Flood) Dropped: " --log-level 4
 iptables -A LOGINVALID -j DROP
@@ -120,7 +120,7 @@ iptables -A INPUT -p tcp -m multiport --dports $GAMESERVERPORTS -j DROP
 
 # SSH
 iptables -A INPUT -p tcp --dport $SSH_PORT -s $YOUR_HOME_IP -j ACCEPT
-iptables -A INPUT -p tcp --dport $SSH_PORT -m state --state NEW -m hashlimit --hashlimit-upto 1/sec --hashlimit-burst 20 --hashlimit-mode srcip,dstport --hashlimit-name SSHPROTECT --hashlimit-htable-expire 3600000 -j ACCEPT
+iptables -A INPUT -p tcp --dport $SSH_PORT -m state --state NEW -m hashlimit --hashlimit-upto 1/sec --hashlimit-burst 20 --hashlimit-mode srcip,dstport --hashlimit-name SSHPROTECT --hashlimit-htable-expire 60000 -j ACCEPT
 
 ## Drop everything else!
 ##--------------------
