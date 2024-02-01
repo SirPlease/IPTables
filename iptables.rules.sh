@@ -100,7 +100,7 @@ iptables -A INPUT -i lo -j ACCEPT
 #### Allow traffic to Gameservers from Whitelisted IPs
 for ip in $WHITELISTED_IPS; do
     iptables -A INPUT -p tcp -m multiport --dports $GAMESERVERPORTS -s $ip -j ACCEPT
-	iptables -A INPUT -p udp -m multiport --dports $GAMESERVERPORTS -s $ip -j ACCEPT
+    iptables -A INPUT -p udp -m multiport --dports $GAMESERVERPORTS -s $ip -j ACCEPT
 done
 
 #### These lengths will never be used for valid packets.
