@@ -1,10 +1,10 @@
 **Setup**
 =========
 
-1. Edit the Script in Notepad and customize it to your liking, everything is explained.
+1. Edit the Script in Notepad and customize it where needed.
 2. Upload the Script to a anywhere the root/sudo can access. (/etc would be the best folder)
-3. Make sure the file is executable, run "chmod +x /locationofthefile/iptables.rules.sh
-4. Run the Script. (/locationofthefile/iptables.rules.sh)
+3. Make sure the file is executable, run "sudo chmod +x /locationofthefile/iptables.rules.sh
+4. Run the Script. (sudo /locationofthefile/iptables.rules.sh)
 5. Run the following command: iptables-save > /etc/iptables.up.rules
 6. You will have to make sure the IPTables are set at System Reboot.
 
